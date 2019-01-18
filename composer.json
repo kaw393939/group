@@ -1,0 +1,44 @@
+{
+    "name": "kaw393939/group",
+    "description": "A description for group.",
+    "type": "package",
+    "license": "MIT",
+    "keywords": [
+        "laravel"
+    ],
+    "authors": [
+        {
+            "name": "Keith",
+            "email": "keith@webizly.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.2",
+        "illuminate/support": "5.7.*",
+        "santigarcor/laratrust": "5.0.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kaw393939\\Group\\": "./src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Kaw393939\\Group\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Kaw393939\\Group\\GroupServiceProvider"
+            ]
+        }
+    },
+    "require-dev": {
+        "orchestra/testbench": "^3.7"
+    }
+
+}
