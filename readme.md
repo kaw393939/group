@@ -28,3 +28,15 @@ If you discover any security-related issues, please email DummyAuthorEmail inste
 
 ## License
 The MIT License (MIT). Please see [License File](/LICENSE.md) for more information.
+
+## Roles and Permissions
+|             |Owner    |Admin  |Member |
+|-------------|------|------|-------|
+|create-group |   ✓  |   ✓  |  0    |
+|store-group  |   ✓	 |   ✓	|  0	|
+|update-group |   ✓	 |   ✓	|  0	|
+|destroy-group|   ✓	 |   0	|  0	|
+|index-group  |   ✓	 |   ✓ 	|  ✓ 	|
+|show-group   |   ✓	 |   ✓	|  ✓ 	|
+|   	      |   	 |   	|   	|
+
