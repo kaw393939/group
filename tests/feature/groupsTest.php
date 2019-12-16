@@ -215,7 +215,7 @@ class GroupsTest extends \Kaw393939\Group\Tests\TestCase
         );
         $response->assertStatus(204);
     }
-    
+
     public function testMyGroups()
     {
         $response = $this->actingAs(User::find(1))

@@ -38,6 +38,66 @@ class GroupsUsersTest extends \Kaw393939\Group\Tests\TestCase
         $response->assertStatus(403);
     }
 
+    // Extended store-group-user Permission tests
+    public function testOwnerCanCreateAdminGroupUser()
+    {
+        $admin = Helpers::createUser($role = 'admin');
+        $owner = Helpers::createUser($role = 'owner');
+        $group = Group::find(1);
+        $response = $this->actingAs($owner)->json(
+            'POST',
+            route('users.store', ['group' => $group->id]),
+            [
+                'email' => $admin->email
+            ]
+        );
+        $response->assertStatus(201);
+    }
+//    public function testAdminCannotCreateOwnerGroupUser()
+//
+//    {
+//        $admin = Helpers::createUser($role = 'admin');
+//        $owner = Helpers::createUser($role = 'owner');
+//        $group = Group::find(1);
+//        $response = $this->actingAs($admin)->json(
+//            'POST',
+//            route('users.store', ['group' => $group->id]),
+//            [
+//                'email' => $owner->email
+//            ]
+//        );
+//        $response->assertStatus(403);
+//    }
+    public function testMemberCannotCreateAdminGroupUser()
+    {
+        $member = Helpers::createUser();
+        $admin = Helpers::createUser($role = 'admin');
+        $group = Group::find(1);
+        $response = $this->actingAs($member)->json(
+            'POST',
+            route('users.store', ['group' => $group->id]),
+            [
+                'email' => $admin->email
+            ]
+        );
+        $response->assertStatus(403);
+    }
+    public function testMemberCannotCreateOwnerGroupUser()
+    {
+        $member = Helpers::createUser();
+        $admin = Helpers::createUser($role = 'admin');
+        $group = Group::find(1);
+        $response = $this->actingAs($member)->json(
+            'POST',
+            route('users.store', ['group' => $group->id]),
+            [
+                'email' => $admin->email
+            ]
+        );
+        $response->assertStatus(403);
+    }
+
+
     public function testDestroyGroupUser()
     {
         $user = Helpers::createUser();
