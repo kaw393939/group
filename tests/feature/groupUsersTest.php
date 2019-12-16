@@ -180,6 +180,18 @@ class GroupsUsersTest extends \Kaw393939\Group\Tests\TestCase
         $response->assertStatus(200);
     }
 
+    //    public function testMemberCannotViewRandomGroupUser()
+    //
+    //    {
+    //        $user = Helpers::createUser();
+    //        $nonmember = Helpers::createUser();
+    //        $group = Helpers::createGroupWithUserRole('member', $user);
+    //        $response = $this->actingAs($nonmember)->json('GET', route('users.index', ['group' => $group->id]));
+    //        $response->assertStatus(403);
+    //    }
+
+
+
     public function testShowGroupUser()
     {
         $response = $this->actingAs(User::find(1))->json('GET', route('users.show', ['group' => '1', 'user' => '1']));
@@ -208,6 +220,70 @@ class GroupsUsersTest extends \Kaw393939\Group\Tests\TestCase
 
         $group = Helpers::createGroupWithUserRole('member', $user);
         $response = $this->actingAs($nonmember)->json(
+            'PATCH',
+            route('users.update', ['group' => $group->id, $user->id]),
+            [
+                'action' => 'attach',
+                'role' => 'admin'
+            ]
+        );
+        $response->assertStatus(403);
+    }
+
+    // Extended update-group-user permission tests
+    public function testAdminCannotUpdateGroupUser()
+    {
+        $user = Helpers::createUser();
+        $admin = Helpers::createUser($role = 'admin');
+        $group = Helpers::createGroupWithUserRole('member', $user);
+        $response = $this->actingAs($admin)->json(
+            'PATCH',
+            route('users.update', ['group' => $group->id, $user->id]),
+            [
+                'action' => 'attach',
+                'role' => 'admin'
+            ]
+        );
+        $response->assertStatus(403);
+    }
+    public function testOwnerCanUpdateAnyGroupUser()
+    {
+        $admin = Helpers::createUser($role = 'admin');
+        $owner = Helpers::createUser($role = 'owner');
+        $group = Helpers::createGroupWithUserRole('admin', $admin, $owner);
+        $response = $this->actingAs($owner)->json(
+            'PATCH',
+            route('users.update', ['group' => $group->id, $admin->id]),
+            [
+                'action' => 'attach',
+                'role' => 'member'
+            ]
+        );
+        $response->assertStatus(200);
+    }
+//    public function testOwnerCannotUpdateRandomGroupUser()
+//
+//    {
+//        $admin = Helpers::createUser($role = 'admin');
+//        $owner = Helpers::createUser($role = 'owner');
+//        $group = Helpers::createGroupWithUserRole('admin', $admin, $owner);
+//        $response = $this->actingAs($owner)->json(
+//            'PATCH',
+//            route('users.update', ['group' => $group->id, $admin->id]),
+//            [
+//                'action' => 'attach',
+//                'role' => 'member'
+//            ]
+//        );
+//        $response->assertStatus(200);
+//    }
+
+    public function testMemberCannotUpdateGroupUser()
+    {
+        $member = Helpers::createUser();
+        $user = Helpers::createUser();
+        $group = Helpers::createGroupWithUserRole('member', $user);
+        $response = $this->actingAs($member)->json(
             'PATCH',
             route('users.update', ['group' => $group->id, $user->id]),
             [
