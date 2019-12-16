@@ -50,6 +50,51 @@ class GroupsTest extends \Kaw393939\Group\Tests\TestCase
         $response->assertStatus(403);
     }
 
+    // Extended store group tests
+    public function testMemberCannotCreateGroup()
+    {
+        $member = Helpers::createUser();
+        $response = $this->actingAs($member)->json(
+            'POST',
+            route('groups.store'),
+            [
+                'name' => 'first-group',
+                'display_name' => 'display name',
+                'description' => 'example'
+            ]
+        );
+        $response->assertStatus(403);
+    }
+    public function testAdminCanCreateGroup()
+    {
+        $admin = Helpers::createUser($role = 'admin');
+        $response = $this->actingAs($admin)->json(
+            'POST',
+            route('groups.store'),
+            [
+                'name' => 'first-group',
+                'display_name' => 'display name',
+                'description' => 'example'
+            ]
+        );
+        $response->assertStatus(201);
+    }
+    public function testOwnerCanCreateGroup()
+    {
+        $owner = Helpers::createUser($role = 'owner');
+        $response = $this->actingAs($owner)->json(
+            'POST',
+            route('groups.store'),
+            [
+                'name' => 'first-group',
+                'display_name' => 'display name',
+                'description' => 'example'
+            ]
+        );
+        $response->assertStatus(201);
+    }
+
+    
     public function testUpdateGroup()
     {
         $response = $this->actingAs(User::find(1))->json(
