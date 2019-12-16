@@ -120,6 +120,59 @@ class GroupsUsersTest extends \Kaw393939\Group\Tests\TestCase
         $response->assertStatus(403);
     }
 
+    // Extended destroy-group-user permission tests
+    public function testMemberCannotDestroyGroupUser()
+    {
+        $group_user = Helpers::createUser();
+        $member_user = Helpers::createUser();
+        $group = Helpers::createGroupWithUserRole('member', $group_user);
+        $response = $this->actingAs($member_user)->json(
+            'DELETE',
+            route('users.destroy', ['group' => $group->id, $group_user->id]));
+        $response->assertStatus(403);
+    }
+    public function testAdminCanDestroyOnlyOwnGroupUser()
+    {
+        $admin_user = Helpers::createUser($role = 'admin');
+        $group = Helpers::createGroupWithUserRole('admin', $admin_user);
+        $response = $this->actingAs($admin_user)->json(
+            'DELETE',
+            route('users.destroy', ['group' => $group->id, $admin_user->id]));
+        $response->assertStatus(204);
+    }
+    public function testAdminCannotDestroyRandomGroupsUser()
+    {
+        $admin1 = Helpers::createUser($role = 'admin');
+        $admin2 = Helpers::createUser($role = 'admin');
+        $group = Helpers::createGroupWithUserRole('admin', $admin1);
+        $response = $this->actingAs($admin2)->json(
+            'DELETE',
+            route('users.destroy', ['group' => $group->id, $admin1->id]));
+        $response->assertStatus(403);
+    }
+//    public function testAdminCannotDestroyOwner()
+//
+//    {
+//        $admin = Helpers::createUser($role = 'admin');
+//        $owner = Helpers::createUser($role = 'owner');
+//        $group = Helpers::createGroupWithUserRole('admin', $admin, $owner);
+//        $response = $this->actingAs($admin)->json(
+//            'DELETE',
+//            route('users.destroy', ['group' => $group->id, $owner->id]));
+//        $response->assertStatus(403);
+//    }
+    public function testOwnerCanDestroyAnyGroupUser()
+    {
+        $admin = Helpers::createUser($role = 'admin');
+        $owner = Helpers::createUser($role = 'owner');
+        $group = Helpers::createGroupWithUserRole('admin', $admin, $owner);
+        $response = $this->actingAs($owner)->json(
+            'DELETE',
+            route('users.destroy', ['group' => $group->id, $admin->id]));
+        $response->assertStatus(204);
+    }
+
+
     public function testIndexGroupUser()
     {
 
