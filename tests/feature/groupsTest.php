@@ -185,6 +185,37 @@ class GroupsTest extends \Kaw393939\Group\Tests\TestCase
         $response->assertStatus(403);
     }
 
+    public function testMemberCannotDestroyGroup()
+    {
+        $member = Helpers::createUser();
+        $response = $this->actingAs($member)->json(
+            'DELETE',
+            route('groups.destroy', ['group' => 1])
+        );
+        $response->assertStatus(403);
+    }
+    public function testAdminCannotDestroyGroup()
+    {
+        $admin = Helpers::createUser($role = 'admin');
+        $group = Helpers::createGroupWithUserRole($role = 'admin', $admin);
+        $response = $this->actingAs($admin)->json(
+            'DELETE',
+            route('groups.destroy', ['group' => $group->id])
+        );
+        $response->assertStatus(403);
+    }
+    public function testOnlyOwnerCanDestroyGroup()
+    {
+        $owner = Helpers::createUser($role = 'owner');
+        $admin = Helpers::createUser($role = 'admin');
+        $group = Helpers::createGroupWithUserRole($role = 'admin', $admin, $owner);
+        $response = $this->actingAs($owner)->json(
+            'DELETE',
+            route('groups.destroy', ['group' => $group->id])
+        );
+        $response->assertStatus(204);
+    }
+    
     public function testMyGroups()
     {
         $response = $this->actingAs(User::find(1))
