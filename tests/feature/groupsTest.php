@@ -94,7 +94,7 @@ class GroupsTest extends \Kaw393939\Group\Tests\TestCase
         $response->assertStatus(201);
     }
 
-    
+
     public function testUpdateGroup()
     {
         $response = $this->actingAs(User::find(1))->json(
@@ -116,6 +116,51 @@ class GroupsTest extends \Kaw393939\Group\Tests\TestCase
             ['name' => 'system',
                 'display_name' => 'System People',
                 'description' => 'example'
+            ]
+        );
+        $response->assertStatus(403);
+    }
+
+    // Extended update group tests
+    public function testMemberCannotUpdateGroup()
+    {
+        $member = Helpers::createUser();
+        $response = $this->actingAs($member)->json(
+            'PATCH',
+            route('groups.update', ['group' => 1]),
+            ['name' => 'system',
+                'display_name' => 'System Users',
+                'description' => 'A Different Description'
+            ]
+        );
+        $response->assertStatus(403);
+    }
+    public function testAdminCanUpdateHisOwnGroup()
+    {
+        $admin = Helpers::createUser($role = 'admin');
+        $group = Helpers::createGroupWithUserRole('admin', $admin);
+        $response = $this->actingAs($admin)->json(
+            'PATCH',
+            route('groups.update', ['group' => $group->id]),
+            ['name' => 'system',
+                'display_name' => 'System Users',
+                'description' => 'A Different Description'
+            ]
+        );
+        $response->assertStatus(200);
+    }
+    public function testAdminCannotUpdateDifferentGroup()
+    {
+        $admin1 = Helpers::createUser($role = 'admin');
+        $admin2 = Helpers::createUser($role = 'admin');
+        $group1 = Helpers::createGroupWithUserRole('admin', $admin1);
+        $group2 = Helpers::createGroupWithUserRole('admin', $admin2);
+        $response = $this->actingAs($admin2)->json(
+            'PATCH',
+            route('groups.update', ['group' => $group1->id]),
+            ['name' => 'system',
+                'display_name' => 'System Users',
+                'description' => 'A Different Description'
             ]
         );
         $response->assertStatus(403);
